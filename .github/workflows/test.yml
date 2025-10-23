@@ -25,7 +25,16 @@ jobs:
       run: npm install
     
     - name: Run TW1 Tests
-      run: npm run test tw1
+      run: |
+        OUTPUT=$(npm run test tw1 2>&1)
+        echo "$OUTPUT"
+        
+        # Check if more than 1 test is skipped
+        SKIPPED=$(echo "$OUTPUT" | grep -oP '\d+(?= skipped)' | head -1 || echo "0")
+        if [ "$SKIPPED" -gt 1 ]; then
+          echo "❌ FAILED: $SKIPPED tests were skipped. Students must implement all features."
+          exit 1
+        fi
 
   tw2-tests:
     name: TW2 Tests
@@ -45,7 +54,16 @@ jobs:
       run: npm install
     
     - name: Run TW2 Tests
-      run: npm run test tw2
+      run: |
+        OUTPUT=$(npm run test tw2 2>&1)
+        echo "$OUTPUT"
+        
+        # Check if more than 1 test is skipped
+        SKIPPED=$(echo "$OUTPUT" | grep -oP '\d+(?= skipped)' | head -1 || echo "0")
+        if [ "$SKIPPED" -gt 1 ]; then
+          echo "❌ FAILED: $SKIPPED tests were skipped. Students must implement all features."
+          exit 1
+        fi
 
   tw3-tests:
     name: TW3 Tests
@@ -65,7 +83,16 @@ jobs:
       run: npm install
     
     - name: Run TW3 Tests
-      run: npm run test tw3
+      run: |
+        OUTPUT=$(npm run test tw3 2>&1)
+        echo "$OUTPUT"
+        
+        # Check if more than 1 test is skipped
+        SKIPPED=$(echo "$OUTPUT" | grep -oP '\d+(?= skipped)' | head -1 || echo "0")
+        if [ "$SKIPPED" -gt 1 ]; then
+          echo "❌ FAILED: $SKIPPED tests were skipped. Students must implement all features."
+          exit 1
+        fi
 
   summary:
     name: Test Summary
