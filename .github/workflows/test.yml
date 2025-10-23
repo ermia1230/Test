@@ -1,0 +1,79 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [22]
+      fail-fast: false
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Run TW1 Tests
+      id: tw1
+      continue-on-error: true
+      run: npm run test tw1
+    
+    - name: Run TW2 Tests
+      id: tw2
+      continue-on-error: true
+      run: npm run test tw2
+    
+    - name: Run TW3 Tests
+      id: tw3
+      continue-on-error: true
+      run: npm run test tw3
+    
+    - name: Test Summary
+      if: always()
+      run: |
+        echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ steps.tw1.outcome }}" == "success" ]; then
+          echo "✅ **TW1 Tests**: PASSED" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **TW1 Tests**: FAILED" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ "${{ steps.tw2.outcome }}" == "success" ]; then
+          echo "✅ **TW2 Tests**: PASSED" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **TW2 Tests**: FAILED" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ "${{ steps.tw3.outcome }}" == "success" ]; then
+          echo "✅ **TW3 Tests**: PASSED" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **TW3 Tests**: FAILED" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "---" >> $GITHUB_STEP_SUMMARY
+        echo "Check individual test steps above for detailed results." >> $GITHUB_STEP_SUMMARY
+    
+    - name: Final Status
+      if: always()
+      run: |
+        if [ "${{ steps.tw1.outcome }}" == "success" ] && [ "${{ steps.tw2.outcome }}" == "success" ] && [ "${{ steps.tw3.outcome }}" == "success" ]; then
+          echo "✅ All tutorial weeks completed successfully!"
+          exit 0
+        else
+          echo "⚠️ Some tutorial weeks have failing tests. Check the summary above."
+          exit 1
+        fi
