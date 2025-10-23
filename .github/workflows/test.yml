@@ -12,17 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
     
-    - name: Setup Node.js 22
-      uses: actions/setup-node@v4
+    - uses: actions/setup-node@v4
       with:
         node-version: 22
         cache: 'npm'
     
-    - name: Install dependencies
-      run: npm install
+    - run: npm install
     
     - name: Run TW1 Tests
       run: |
@@ -33,40 +30,47 @@ jobs:
         PASSED=$(echo "$OUTPUT" | grep -oP '\d+(?= passed)' | head -1 || echo "0")
         FAILED=$(echo "$OUTPUT" | grep -oP '\d+(?= failed)' | head -1 || echo "0")
         SKIPPED=$(echo "$OUTPUT" | grep -oP '\d+(?= skipped)' | head -1 || echo "0")
+        TOTAL=$(echo "$OUTPUT" | grep -oP '\d+(?= total)' | head -1 || echo "0")
         
         echo "Results: $PASSED passed, $FAILED failed, $SKIPPED skipped"
         
-        # Tests fail only if there are actual failures
-        # Skipped tests are allowed (students can choose React or Vue)
+        # Fail if there are actual test failures
         if [ "$FAILED" -gt 0 ]; then
           echo "FAILED: $FAILED test(s) failed"
           exit 1
         fi
         
-        # Ensure at least some tests passed
+        # Fail if no tests passed at all
         if [ "$PASSED" -eq 0 ]; then
           echo "FAILED: No tests passed. Please implement at least one framework (React or Vue)"
           exit 1
         fi
         
-        echo "SUCCESS: $PASSED test(s) passed"
+        # Fail if too many tests are skipped (more than 50% of total tests)
+        if [ "$TOTAL" -gt 0 ] && [ "$SKIPPED" -gt 0 ]; then
+          SKIP_PERCENTAGE=$((SKIPPED * 100 / TOTAL))
+          if [ "$SKIP_PERCENTAGE" -gt 50 ]; then
+            echo "WARNING: $SKIP_PERCENTAGE% of tests skipped ($SKIPPED/$TOTAL)"
+            echo "FAILED: Too many tests skipped. Please implement the required functionality."
+            exit 1
+          fi
+        fi
+        
+        echo "✅ SUCCESS: $PASSED test(s) passed"
 
   tw2-tests:
     name: TW2 Tests
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
     
-    - name: Setup Node.js 22
-      uses: actions/setup-node@v4
+    - uses: actions/setup-node@v4
       with:
         node-version: 22
         cache: 'npm'
     
-    - name: Install dependencies
-      run: npm install
+    - run: npm install
     
     - name: Run TW2 Tests
       run: |
@@ -77,20 +81,30 @@ jobs:
         PASSED=$(echo "$OUTPUT" | grep -oP '\d+(?= passed)' | head -1 || echo "0")
         FAILED=$(echo "$OUTPUT" | grep -oP '\d+(?= failed)' | head -1 || echo "0")
         SKIPPED=$(echo "$OUTPUT" | grep -oP '\d+(?= skipped)' | head -1 || echo "0")
+        TOTAL=$(echo "$OUTPUT" | grep -oP '\d+(?= total)' | head -1 || echo "0")
         
         echo "Results: $PASSED passed, $FAILED failed, $SKIPPED skipped"
         
-        # Tests fail only if there are actual failures
-        # Skipped tests are allowed (students can choose React or Vue)
+        # Fail if there are actual test failures
         if [ "$FAILED" -gt 0 ]; then
           echo "FAILED: $FAILED test(s) failed"
           exit 1
         fi
         
-        # Ensure at least some tests passed
+        # Fail if no tests passed at all
         if [ "$PASSED" -eq 0 ]; then
           echo "FAILED: No tests passed. Please implement at least one framework (React or Vue)"
           exit 1
+        fi
+        
+        # Fail if too many tests are skipped (more than 50% of total tests)
+        if [ "$TOTAL" -gt 0 ] && [ "$SKIPPED" -gt 0 ]; then
+          SKIP_PERCENTAGE=$((SKIPPED * 100 / TOTAL))
+          if [ "$SKIP_PERCENTAGE" -gt 50 ]; then
+            echo "WARNING: $SKIP_PERCENTAGE% of tests skipped ($SKIPPED/$TOTAL)"
+            echo "FAILED: Too many tests skipped. Please implement the required functionality."
+            exit 1
+          fi
         fi
         
         echo "SUCCESS: $PASSED test(s) passed"
@@ -100,17 +114,14 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
     
-    - name: Setup Node.js 22
-      uses: actions/setup-node@v4
+    - uses: actions/setup-node@v4
       with:
         node-version: 22
         cache: 'npm'
     
-    - name: Install dependencies
-      run: npm install
+    - run: npm install
     
     - name: Run TW3 Tests
       run: |
@@ -121,23 +132,33 @@ jobs:
         PASSED=$(echo "$OUTPUT" | grep -oP '\d+(?= passed)' | head -1 || echo "0")
         FAILED=$(echo "$OUTPUT" | grep -oP '\d+(?= failed)' | head -1 || echo "0")
         SKIPPED=$(echo "$OUTPUT" | grep -oP '\d+(?= skipped)' | head -1 || echo "0")
+        TOTAL=$(echo "$OUTPUT" | grep -oP '\d+(?= total)' | head -1 || echo "0")
         
         echo "Results: $PASSED passed, $FAILED failed, $SKIPPED skipped"
         
-        # Tests fail only if there are actual failures
-        # Skipped tests are allowed (students can choose React or Vue)
+        # Fail if there are actual test failures
         if [ "$FAILED" -gt 0 ]; then
-          echo "FAILED: $FAILED test(s) failed"
+          echo "❌ FAILED: $FAILED test(s) failed"
           exit 1
         fi
         
-        # Ensure at least some tests passed
+        # Fail if no tests passed at all
         if [ "$PASSED" -eq 0 ]; then
-          echo "FAILED: No tests passed. Please implement at least one framework (React or Vue)"
+          echo "❌ FAILED: No tests passed. Please implement at least one framework (React or Vue)"
           exit 1
         fi
         
-        echo "SUCCESS: $PASSED test(s) passed"
+        # Fail if too many tests are skipped (more than 50% of total tests)
+        if [ "$TOTAL" -gt 0 ] && [ "$SKIPPED" -gt 0 ]; then
+          SKIP_PERCENTAGE=$((SKIPPED * 100 / TOTAL))
+          if [ "$SKIP_PERCENTAGE" -gt 50 ]; then
+            echo "⚠️  WARNING: $SKIP_PERCENTAGE% of tests skipped ($SKIPPED/$TOTAL)"
+            echo "❌ FAILED: Too many tests skipped. Please implement the required functionality."
+            exit 1
+          fi
+        fi
+        
+        echo "✅ SUCCESS: $PASSED test(s) passed"
 
   summary:
     name: Test Summary
