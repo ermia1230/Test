@@ -23,34 +23,15 @@ jobs:
     
     - name: Install dependencies
       run: npm install
+
+    - name: Update Iprog-test
+      run: npm update @iprog/test
     
     - name: Run TW1 Tests
       run: |
-        OUTPUT=$(npm run test tw1 2>&1)
+        OUTPUT=$(npm run test_github tw1)
         echo "$OUTPUT"
         
-        # Extract test results
-        PASSED=$(echo "$OUTPUT" | grep -oP '\d+(?= passed)' | head -1 || echo "0")
-        FAILED=$(echo "$OUTPUT" | grep -oP '\d+(?= failed)' | head -1 || echo "0")
-        SKIPPED=$(echo "$OUTPUT" | grep -oP '\d+(?= skipped)' | head -1 || echo "0")
-        
-        echo "Results: $PASSED passed, $FAILED failed, $SKIPPED skipped"
-        
-        # Tests fail only if there are actual failures
-        # Skipped tests are allowed (students can choose React or Vue)
-        if [ "$FAILED" -gt 0 ]; then
-          echo "FAILED: $FAILED test(s) failed"
-          exit 1
-        fi
-        
-        # Ensure at least some tests passed
-        if [ "$PASSED" -eq 0 ]; then
-          echo "FAILED: No tests passed. Please implement at least one framework (React or Vue)"
-          exit 1
-        fi
-        
-        echo "SUCCESS: $PASSED test(s) passed"
-
   tw2-tests:
     name: TW2 Tests
     runs-on: ubuntu-latest
@@ -67,33 +48,15 @@ jobs:
     
     - name: Install dependencies
       run: npm install
+
+    - name: Update Iprog-test
+      run: npm update @iprog/test
     
     - name: Run TW2 Tests
       run: |
-        OUTPUT=$(npm run test tw2 2>&1)
+        OUTPUT=$(npm run test_github tw2 )
         echo "$OUTPUT"
         
-        # Extract test results
-        PASSED=$(echo "$OUTPUT" | grep -oP '\d+(?= passed)' | head -1 || echo "0")
-        FAILED=$(echo "$OUTPUT" | grep -oP '\d+(?= failed)' | head -1 || echo "0")
-        SKIPPED=$(echo "$OUTPUT" | grep -oP '\d+(?= skipped)' | head -1 || echo "0")
-        
-        echo "Results: $PASSED passed, $FAILED failed, $SKIPPED skipped"
-        
-        # Tests fail only if there are actual failures
-        # Skipped tests are allowed (students can choose React or Vue)
-        if [ "$FAILED" -gt 0 ]; then
-          echo "FAILED: $FAILED test(s) failed"
-          exit 1
-        fi
-        
-        # Ensure at least some tests passed
-        if [ "$PASSED" -eq 0 ]; then
-          echo "FAILED: No tests passed. Please implement at least one framework (React or Vue)"
-          exit 1
-        fi
-        
-        echo "SUCCESS: $PASSED test(s) passed"
 
   tw3-tests:
     name: TW3 Tests
@@ -111,74 +74,14 @@ jobs:
     
     - name: Install dependencies
       run: npm install
+
+    - name: Update Iprog-test
+      run: npm update @iprog/test
     
     - name: Run TW3 Tests
       run: |
-        OUTPUT=$(npm run test tw3 2>&1)
+        OUTPUT=$(npm run test_github tw3)
         echo "$OUTPUT"
         
-        # Extract test results
-        PASSED=$(echo "$OUTPUT" | grep -oP '\d+(?= passed)' | head -1 || echo "0")
-        FAILED=$(echo "$OUTPUT" | grep -oP '\d+(?= failed)' | head -1 || echo "0")
-        SKIPPED=$(echo "$OUTPUT" | grep -oP '\d+(?= skipped)' | head -1 || echo "0")
-        
-        echo "Results: $PASSED passed, $FAILED failed, $SKIPPED skipped"
-        
-        # Tests fail only if there are actual failures
-        # Skipped tests are allowed (students can choose React or Vue)
-        if [ "$FAILED" -gt 0 ]; then
-          echo "FAILED: $FAILED test(s) failed"
-          exit 1
-        fi
-        
-        # Ensure at least some tests passed
-        if [ "$PASSED" -eq 0 ]; then
-          echo "FAILED: No tests passed. Please implement at least one framework (React or Vue)"
-          exit 1
-        fi
-        
-        echo "SUCCESS: $PASSED test(s) passed"
 
-  summary:
-    name: Test Summary
-    runs-on: ubuntu-latest
-    needs: [tw1-tests, tw2-tests, tw3-tests]
-    if: always()
-    
-    steps:
-    - name: Generate Summary
-      run: |
-        PASSED=0
-        
-        if [ "${{ needs.tw1-tests.result }}" == "success" ]; then
-          TW1_STATUS="PASSED"
-          PASSED=$((PASSED + 1))
-        else
-          TW1_STATUS="FAILED"
-        fi
-        
-        if [ "${{ needs.tw2-tests.result }}" == "success" ]; then
-          TW2_STATUS="PASSED"
-          PASSED=$((PASSED + 1))
-        else
-          TW2_STATUS="FAILED"
-        fi
-        
-        if [ "${{ needs.tw3-tests.result }}" == "success" ]; then
-          TW3_STATUS="PASSED"
-          PASSED=$((PASSED + 1))
-        else
-          TW3_STATUS="FAILED"
-        fi
-        
-        echo "## Test Results: $PASSED/3 Tutorial Weeks Completed" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "- **TW1 Tests**: $TW1_STATUS" >> $GITHUB_STEP_SUMMARY
-        echo "- **TW2 Tests**: $TW2_STATUS" >> $GITHUB_STEP_SUMMARY
-        echo "- **TW3 Tests**: $TW3_STATUS" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### Note" >> $GITHUB_STEP_SUMMARY
-        echo "Skipped tests are allowed - you can implement either React or Vue (or both)." >> $GITHUB_STEP_SUMMARY
-        echo "Tests only fail if there are actual test failures or no tests pass at all." >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "Tutorial Weeks Completed: $PASSED/3"
+ 
