@@ -2,3 +2,7 @@
 .debug {
     border-style:solid;
 }
+
+.textAlign{
+    text-align: right;
+}

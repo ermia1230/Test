@@ -1,29 +1,81 @@
 /* uncomment the export below to enable the 1.1.2 test suite! */
-/* export */ function compareIngredientsCB(ingredientA, ingredientB){
-    return // TODO
+export function compareIngredientsCB(ingredientA, ingredientB){
+
+    if(ingredientA.aisle < ingredientB.aisle) {
+        return -1;
+    }
+    else if(ingredientA.aisle > ingredientB.aisle) {
+        return 1;
+    }
+    else if(ingredientA.aisle == ingredientB.aisle && ingredientA.name < ingredientB.name) {
+        return -1;
+    }
+    else if(ingredientA.aisle == ingredientB.aisle && ingredientA.name > ingredientB.name) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
 }
 
 export function sortIngredients(ingredients){
-    return // TODO
+    return [...ingredients].sort(compareIngredientsCB);
 }
 
-/* export */ function isKnownTypeCB(type){
+export function isKnownTypeCB(type){
     // don't forget the return keyword (goes for all functions below)
+    return (type === "starter" || type === "main course" || type === "dessert");
 }
 
 export function dishType(dish){
+    if(!dish.dishTypes)  {
+        return "";
+    }
+    const dishTt = dish.dishTypes.filter(isKnownTypeCB)[0];
+    if(dishTt) {
+        return dishTt;
+    }
+    else {
+        return "";
+    }
+
 }
 
-/* export */ function compareDishesCB(dishA, dishB){
+export function compareDishesCB(dishA, dishB){
+
+    const dishTypeForA = dishType(dishA);
+    const dishTypeForB = dishType(dishB);
+    const valueForDishA = valueForDish(dishTypeForA);
+    const valueForDishB = valueForDish(dishTypeForB);
+    return valueForDishA - valueForDishB;
+}
+
+function valueForDish(dishType) {
+    if(dishType === "starter") {
+        return 1;
+    }
+    if(dishType === "main course") {
+        return 2;
+    }
+    if(dishType === "dessert") {
+        return 3;
+    }
+    else {
+        return 0;
+    }
 }
 
 
 export function sortDishes(dishes){
+    return [...dishes].sort(compareDishesCB);
 }
 
-/*export */ function menuPrice(dishesArray){
- 
-}
+export function menuPrice(dishesArray){
+    function reducerCB(acc, element) {
+        return element.pricePerServing + acc;
+    }
+    const newPrice = [...dishesArray].reduce(reducerCB, 0);
+    return newPrice}
 
 /* 
   This function is already implemented as it is more JavaScript + algorithms than interaction programming
@@ -33,7 +85,7 @@ export function sortDishes(dishes){
    
    As this is not an algorithm course, the function is mostly written but you have 2 callback passing TODOs.
 */
-function shoppingList(dishes){
+export function shoppingList(dishes){
     const result={}; // object used as mapping between ingredient ID and ingredient object
 
     // we define the callback inside the function, though this is not strictly needed in this case. But see below.
@@ -63,9 +115,9 @@ function shoppingList(dishes){
         }
     }
 
-    const arrayOfIngredientArrays= dishes.map(/*TODO pass the callback that transforms a dish to its ingredients */);
+    const arrayOfIngredientArrays= dishes.map(keepJustIngredientsCB);
     const allIngredients= arrayOfIngredientArrays.flat();    
-    allIngredients.forEach(/* TODO: pass the callback that treats an ingredient */);
+    allIngredients.forEach(ingredientCB);
 
     // Note: the 3 lines above can be written as a function chain:
     // dishes.map(callback1).flat().forEach(callback2);

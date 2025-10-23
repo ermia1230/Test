@@ -1,7 +1,8 @@
 import "/src/teacherFetch.js"; // protection against fetch() in infinite loops
 import { reactive } from "vue";
+import { model } from "./DinnerModel";
 
-export const reactiveModel="make a reactive object out of the model exported from DinnerModel";
+const reactiveModel= reactive(model);
 
 
 
@@ -12,4 +13,7 @@ window.myModel= reactiveModel;
 
 // making some example dishes available 
 import {dishesConst} from "/src/dishesConst.js";
+import react from "react";
 window.dishesConst= dishesConst;
+
+export {reactiveModel};
